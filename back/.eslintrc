@@ -1,0 +1,21 @@
+
+{
+  "extends": "cp",
+  "rules": {
+    "strict": [0, "global"]
+  },
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourceType": "module"
+  },
+  "globals": {
+    "document": true,
+    "describe": true,
+    "it": true,
+    "before": true,
+    "beforeEach": true,
+    "after": true,
+    "afterEach": true,
+    "testEndpoint": true
+  }
+}

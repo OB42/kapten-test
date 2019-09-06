@@ -1,0 +1,58 @@
+{
+  "name": "loyalty",
+  "version": "1.0.0",
+  "description": "Loyalty service technical test back-end",
+  "main": "src/app.js",
+  "scripts": {
+    "coverage": "LOGGER_LEVEL=fatal NODE_ENV=test nyc _mocha -b",
+    "eslint": "eslint src",
+    "mocha": "NODE_ENV=test _mocha -b",
+    "start": "node .",
+    "start:dev": "USE_BUNYAN_PRETTY_STREAM=true nodemon .",
+    "start:loyalty_worker": "node src/workers/loyalty",
+    "postinstall": "npm run apidoc",
+    "pretest": "npm run eslint",
+    "test": "npm run coverage",
+    "apidoc": "apidoc -i src/api -o apidoc/"
+  },
+  "engines": {
+    "node": "8.5"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "author": "Kapten",
+  "devDependencies": {
+    "bunyan": "1.8.12",
+    "chai": "4.0.2",
+    "dirty-chai": "2.0.1",
+    "eslint": "3.10.1",
+    "eslint-config-airbnb": "13.0.0",
+    "eslint-config-cp": "4.0.0",
+    "eslint-plugin-import": "2.2.0",
+    "mocha": "3.2.0",
+    "nock": "9.0.13",
+    "nodemon": "1.11.0",
+    "nyc": "10.0.0",
+    "sinon": "^2.3.2",
+    "sinon-chai": "2.13.0",
+    "supertest": "3.0.0"
+  },
+  "dependencies": {
+    "amqplib": "0.5.2",
+    "apidoc": "0.17.5",
+    "body-parser": "1.16.1",
+    "chpr-logger": "2.4.1",
+    "chpr-worker": "2.1.1",
+    "co": "4.6.0",
+    "co-express": "1.2.2",
+    "express": "4.14.1",
+    "express-middleware": "3.0.0",
+    "http-errors": "1.5.1",
+    "http-status-codes": "1.1.6",
+    "joi": "10.2.2",
+    "lodash": "4.17.4",
+    "moment": "2.17.1",
+    "mongodb": "2.2.24"
+  }
+}

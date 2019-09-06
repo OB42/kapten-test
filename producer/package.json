@@ -1,0 +1,23 @@
+{
+  "name": "producer",
+  "version": "1.0.0",
+  "description": "RabbitMQ messages producer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node . | bunyan"
+  },
+  "author": "Gilles Rasigade",
+  "dependencies": {
+    "amqplib": "0.5.1",
+    "bunyan": "1.8.10",
+    "chpr-logger": "2.4.1",
+    "lodash": "^4.17.4",
+    "mongodb": "^3.0.10"
+  },
+  "devDependencies": {
+    "eslint": "3.10.1",
+    "eslint-config-airbnb": "13.0.0",
+    "eslint-config-cp": "4.0.0",
+    "eslint-plugin-import": "2.2.0"
+  }
+}
