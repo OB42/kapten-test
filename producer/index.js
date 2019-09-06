@@ -268,7 +268,7 @@ async function main(n, interval = 1000) {
   }
 }
 
-main(process.env.N, process.env.T)
+main(process.env.N, process.env.TIC)
   .then(() => {
     logger.info('> Worker stopped');
     process.exit(0);
