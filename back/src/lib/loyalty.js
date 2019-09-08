@@ -27,7 +27,16 @@ function _getStatusIndex(rideCount) {
  * @returns {string} loyalty status
  */
 function getLoyaltyStatusForRideCount(rideCount) {
-  // TODO make tests pass
+  if (rideCount < 20) {
+    return 'bronze';
+  } else if (rideCount < 50) {
+    return 'silver';
+  } else if (rideCount < 100) {
+    return 'gold';
+  } else if (rideCount >= 100) {
+    return 'platinum';
+  }
+  return 'bronze';
 }
 
 /**
@@ -39,7 +48,8 @@ function getLoyaltyStatusForRideCount(rideCount) {
  * @returns {Number} amount of earned loyalty points
  */
 function getLoyaltyPointsForRideAmount(loyaltyStatus, rideAmount) {
-  // TODO make tests pass
+  const multipliers = { bronze: 1, silver: 3, gold: 5, platinum: 10 };
+  return rideAmount * multipliers[loyaltyStatus];
 }
 
 /**
