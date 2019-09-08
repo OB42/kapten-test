@@ -1,6 +1,7 @@
 'use strict';
 
 const logger = require('chpr-logger');
+const { ObjectId } = require('mongodb');
 
 const { handleMessageError } = require('../../../lib/workers');
 const riderModel = require('../../../models/riders');
@@ -18,9 +19,13 @@ async function handleSignupEvent(message, messageFields) {
   logger.info(
     { rider_id: riderId, name },
     '[worker.handleSignupEvent] Received user signup event');
-
-  // TODO make test pass if rider already created
-
+  const rider = await riderModel.findOneById(
+    ObjectId.createFromHexString(riderId)
+  );
+  if (rider) {
+    logger.info('[worker.handleSignupEvent] Rider already treated');
+    return;
+  }
   try {
     logger.info(
       { rider_id: riderId, name },
