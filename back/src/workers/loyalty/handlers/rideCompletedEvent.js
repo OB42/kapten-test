@@ -44,9 +44,8 @@ async function handleRideCompletedEvent(message) {
       amount,
       state: 'completed'
     });
-  } else {
-    await rideModel.updateOne(rideId, { state: 'completed' });
   }
+  await rideModel.updateOne(rideId, { state: 'completed' });
   await riderModel.updateOne(rider._id, {
     points: loyalty.getLoyaltyPointsForRideAmount(rider.status, amount),
     ride_count: rider.ride_count + 1

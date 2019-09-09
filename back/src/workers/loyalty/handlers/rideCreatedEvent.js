@@ -13,7 +13,7 @@ const riderModel = require('../../../models/riders');
  * @returns {void}
  */
 async function handleRideCreatedEvent(message) {
-  const { id: rideId, rider_id: riderId, amount, name } = message;
+  const { id: rideId, rider_id: riderId, amount } = message;
   logger.info(
     { ride_id: rideId, rider_id: riderId, amount },
     '[worker.handleRideCreatedEvent] Received user ride created event');
@@ -25,9 +25,6 @@ async function handleRideCreatedEvent(message) {
     rider = {
       _id: riderId
     };
-    if (name) {
-      rider.name = rider;
-    }
     logger.info(
       { rider_id: riderId },
       '[worker.handleRideCreatedEvent] Rider does not exists: insert him');
