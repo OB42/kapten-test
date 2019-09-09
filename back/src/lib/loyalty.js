@@ -27,14 +27,12 @@ function _getStatusIndex(rideCount) {
  * @returns {string} loyalty status
  */
 function getLoyaltyStatusForRideCount(rideCount) {
-  if (rideCount < 20) {
-    return 'bronze';
-  } else if (rideCount < 50) {
-    return 'silver';
-  } else if (rideCount < 100) {
-    return 'gold';
-  } else if (rideCount >= 100) {
+  if (rideCount >= 100) {
     return 'platinum';
+  } else if (rideCount >= 50) {
+    return 'gold';
+  } else if (rideCount >= 20) {
+    return 'silver';
   }
   return 'bronze';
 }
