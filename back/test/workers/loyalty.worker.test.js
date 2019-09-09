@@ -209,7 +209,10 @@ describe('workers/loyalty', () => {
       expect(rides).to.deep.equal([{
         _id: ObjectId.createFromHexString('111111111111111111111110'),
         rider_id: ObjectId.createFromHexString('000000000000000000000001'),
-        amount: 10
+        amount: 10,
+        created_at: date,
+        rider_status: 'bronze',
+        state: 'created'
       }]);
 
       expect(infoSpy.args).to.deep.equal([
@@ -248,7 +251,9 @@ describe('workers/loyalty', () => {
       expect(rides).to.deep.equal([{
         _id: ObjectId.createFromHexString('111111111111111111111110'),
         rider_id: ObjectId.createFromHexString('000000000000000000000001'),
-        amount: 10
+        amount: 10,
+        created_at: date,
+        state: 'created'
       }]);
 
       expect(infoSpy.args).to.deep.equal([
@@ -276,6 +281,7 @@ describe('workers/loyalty', () => {
         state: 'created',
         amount: 10,
         rider_status: 'bronze',
+        state: 'created',
         created_at: date
       }]);
 
@@ -411,7 +417,8 @@ describe('workers/loyalty', () => {
         _id: rideObjectId,
         rider_id: riderObjectId,
         amount: 10,
-        created_at: date
+        created_at: date,
+        state: 'completed'
       });
 
       expect(infoSpy.args).to.deep.equal([
@@ -462,7 +469,8 @@ describe('workers/loyalty', () => {
         _id: rideObjectId,
         rider_id: riderObjectId,
         amount: 10,
-        created_at: date
+        created_at: date,
+        state: 'completed'
       });
 
       expect(infoSpy.args).to.deep.equal([

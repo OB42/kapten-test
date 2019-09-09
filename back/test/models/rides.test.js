@@ -25,20 +25,27 @@ describe('models/rides', () => {
       const ride = await rides.insertOne({
         _id: ObjectId.createFromHexString('000000000000000000000001'),
         rider_id: ObjectId.createFromHexString('111111111111111111111110'),
-        amount: 10
+        amount: 10,
+        created_at: date,
+        state: 'created'
       });
 
       expect(ride).to.deep.equal({
         _id: ObjectId.createFromHexString('000000000000000000000001'),
         rider_id: ObjectId.createFromHexString('111111111111111111111110'),
-        amount: 10
+        amount: 10,
+        created_at: date,
+        state: 'created'
       });
 
       const dbRides = await rides.collection().find().toArray();
       expect(dbRides).to.deep.equal([{
         _id: ObjectId.createFromHexString('000000000000000000000001'),
         rider_id: ObjectId.createFromHexString('111111111111111111111110'),
-        amount: 10
+        amount: 10,
+        created_at: date,
+        state: 'created'
+
       }]);
     });
   });
@@ -55,18 +62,21 @@ describe('models/rides', () => {
           _id: ObjectId.createFromHexString('000000000000000000000001'),
           rider_id: ObjectId.createFromHexString('111111111111111111111110'),
           amount: 10,
-          created_at: date
+          created_at: date,
+          state: 'created'
         },
         {
           _id: ObjectId.createFromHexString('000000000000000000000002'),
           rider_id: ObjectId.createFromHexString('111111111111111111111110'),
           amount: 25,
+          state: 'created',
           created_at: date
         },
         {
           _id: ObjectId.createFromHexString('000000000000000000000003'),
           rider_id: ObjectId.createFromHexString('111111111111111111111111'),
           amount: 50,
+          state: 'created',
           created_at: date
         }
       ]);
@@ -79,6 +89,7 @@ describe('models/rides', () => {
           _id: ObjectId.createFromHexString('000000000000000000000003'),
           rider_id: ObjectId.createFromHexString('111111111111111111111111'),
           amount: 50,
+          state: 'created',
           created_at: date
         }
       ]);
@@ -109,7 +120,8 @@ describe('models/rides', () => {
         {
           _id: '000000000000000000000001',
           rider_id: '111111111111111111111110',
-          amount: 10
+          amount: 10,
+          state: 'created'
         }
       );
     });
@@ -121,7 +133,9 @@ describe('models/rides', () => {
       expect(results).to.deep.equal({
         _id: ObjectId.createFromHexString('000000000000000000000001'),
         rider_id: ObjectId.createFromHexString('111111111111111111111110'),
-        amount: 10
+        amount: 10,
+        created_at: date,
+        state: 'created'
       });
     });
 
