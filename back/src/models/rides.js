@@ -1,13 +1,19 @@
 'use strict';
 
+const { loyaltyStatuses } = require('../constants/loyalty');
 const { getDb } = require('../lib/mongodb');
 const Joi = require('../lib/joi');
+const dateLib = require('../lib/date');
 
 const COLLECTION_NAME = 'rides';
 
 const modelSchema = Joi.object({
   _id: Joi.objectId().required(),
-  rider_id: Joi.objectId().required()
+  rider_id: Joi.objectId().required(),
+  created_at: Joi.date().default(() => dateLib.getDate(), 'time of creation'),
+  rider_status: Joi.valid(loyaltyStatuses),
+  state: Joi.string().default('created'),
+  rider_update: Joi.object()
 }).unknown();
 
 /**
