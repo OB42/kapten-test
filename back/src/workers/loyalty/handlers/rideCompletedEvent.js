@@ -44,7 +44,16 @@ async function handleRideCompletedEvent(message) {
       amount,
       state: 'completed'
     });
+  } else {
+    await rideModel.updateOne(rideId, { state: 'completed' });
   }
+  await riderModel.updateOne(rider._id, {
+    points: loyalty.getLoyaltyPointsForRideAmount(rider.status, amount),
+    ride_count: rider.ride_count + 1
+  });
+  logger.info(
+    { ride_id: rideId, rider_id: riderId, rider_update: loyalty.getRiderUpdate(rider, amount) },
+      '[worker.handleRideCompletedEvent] Update rider');
 }
 
 module.exports = handleRideCompletedEvent;
