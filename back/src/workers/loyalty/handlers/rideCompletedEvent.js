@@ -1,7 +1,10 @@
 'use strict';
 
 const logger = require('chpr-logger');
-
+const { ObjectId } = require('mongodb');
+const riderModel = require('../../../models/riders');
+const rideModel = require('../../../models/rides');
+const loyalty = require('../../../lib/loyalty');
 /**
  * Bus message handler for ride complete events
  *
@@ -14,10 +17,34 @@ async function handleRideCompletedEvent(message) {
   logger.info(
     { ride_id: rideId, rider_id: riderId, amount },
     '[worker.handleRideCompletedEvent] Received user ride completed event');
+  let ride = await rideModel.findOneById(
+    ObjectId.createFromHexString(rideId)
+  );
 
-  // TODO handle edge cases (no rider, no ride), to make tests pass
 
-  // TODO Complete ride + update rider's status
+  let rider = await riderModel.findOneById(
+    ObjectId.createFromHexString(riderId)
+  );
+  if (!rider) {
+    logger.info(
+      { rider_id: riderId },
+      '[worker.handleRideCompletedEvent] Rider does not exists: insert him');
+    rider = {
+      _id: riderId
+    };
+    rider = await riderModel.insertOne(rider);
+  }
+  if (!ride) {
+    logger.info(
+      { ride_id: rideId, rider_id: riderId },
+      '[worker.handleRideCompletedEvent] Insert ride');
+    ride = await rideModel.insertOne({
+      _id: rideId,
+      rider_id: riderId,
+      amount,
+      state: 'completed'
+    });
+  }
 }
 
 module.exports = handleRideCompletedEvent;
