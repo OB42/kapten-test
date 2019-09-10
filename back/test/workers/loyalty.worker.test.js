@@ -402,10 +402,31 @@ describe('workers/loyalty', () => {
       rider_id: riderId
     };
 
-    // TODO add tests to
-    // - validate ride and rider updates when ride completed
-    // - validate idempotency if message was already received
-    // - make sure that the message' schema is validated
+    it('does not try to update the db if the message was already received', async () => {
+      await riderModel.insertOne(riderBefore);
+
+      await publish('ride.completed', message);
+
+      const ride = await rideModel.findOneById(rideObjectId);
+      const rider = await riderModel.findOneById(ride.rider_id);
+      await publish('ride.completed', message);
+      expect(ride).to.deep.equal(await rideModel.findOneById(rideObjectId));
+      expect(rider).to.deep.equal(await riderModel.findOneById(ride.rider_id));
+      expect(infoSpy.args.slice(-2)).to.deep.equal([
+        [
+          {
+            ride_id: '111111111111111111111110',
+            rider_id: '000000000000000000000001',
+            amount: 10
+          },
+          '[worker.handleRideCompletedEvent] Received user ride completed event'
+        ],
+        [
+          { ride_id: '111111111111111111111110' },
+          '[worker.handleRideCompletedEvent] Ride already completed'
+        ]
+      ]);
+    });
 
     it('saves ride in db then completes it if it does not exist', async () => {
       await riderModel.insertOne(riderBefore);
