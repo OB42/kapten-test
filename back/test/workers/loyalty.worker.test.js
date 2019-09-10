@@ -214,6 +214,7 @@ describe('workers/loyalty', () => {
         rider_status: 'bronze',
         state: 'created'
       }]);
+      console.log('42');
 
       expect(infoSpy.args).to.deep.equal([
         [
