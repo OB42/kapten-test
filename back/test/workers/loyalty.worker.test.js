@@ -403,8 +403,6 @@ describe('workers/loyalty', () => {
     };
 
     it('does not try to update the db if the message was already received', async () => {
-      await riderModel.insertOne(riderBefore);
-
       await publish('ride.completed', message);
 
       const ride = await rideModel.findOneById(rideObjectId);
@@ -425,6 +423,55 @@ describe('workers/loyalty', () => {
           { ride_id: '111111111111111111111110' },
           '[worker.handleRideCompletedEvent] Ride already completed'
         ]
+      ]);
+    });
+
+    it('set the ride as complete if it already exists', async () => {
+      await rideModel.insertOne({
+        _id: rideObjectId,
+        rider_id: riderObjectId,
+        amount: 10,
+        created_at: date,
+        state: 'created'
+      });
+
+      await publish('ride.completed', message);
+
+      const ride = await rideModel.findOneById(rideObjectId);
+      expect(ride).to.deep.equal({
+        _id: rideObjectId,
+        rider_id: riderObjectId,
+        amount: 10,
+        created_at: date,
+        state: 'completed'
+      });
+      expect(infoSpy.args).to.deep.equal([
+          [
+            {
+              "ride_id": "111111111111111111111110",
+              "rider_id": "000000000000000000000001",
+              "amount": 10
+            },
+            "[worker.handleRideCompletedEvent] Received user ride completed event"
+          ],
+          [
+            {
+              "rider_id": "000000000000000000000001"
+            },
+            "[worker.handleRideCompletedEvent] Rider does not exists: insert him"
+          ],
+          [
+            {
+              "ride_id": "111111111111111111111110",
+              "rider_id": "000000000000000000000001",
+              "rider_update": {
+                "ride_count": 1,
+                "points": 10,
+                "status": "bronze"
+              }
+            },
+            "[worker.handleRideCompletedEvent] Update rider"
+          ]
       ]);
     });
 
