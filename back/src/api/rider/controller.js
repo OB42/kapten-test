@@ -8,7 +8,6 @@ const ridersLib = require('../../lib/riders');
 const { getLoyaltyInfoSchema, getAverageSpendingSchema } = require('./schemas');
 
 const { RIDER_NOT_FOUND } = ridersLib;
-
 /**
  * Get current rider status
  *
@@ -70,11 +69,23 @@ async function getAverageSpendingByStatus(req, res) {
   const { rider_id: riderId, status } = validatedParams;
   req.logger.info(
     { rider_id: riderId, status },
-    '[average_spending#getRidesByStatus]  requested');
-  // TOOD:
-  // get rides and calculate average spending
-  // handle edge cases
-  return res.send('');
+    '[average_spending#getRidesByStatus] Average rider spending requested');
+  let averageSpending;
+  try {
+    averageSpending = await ridersLib.getAverageSpendingByStatus(riderId, status);
+  } catch (err) {
+    if (err.message === RIDER_NOT_FOUND.message) {
+      req.logger.info(
+        { rider_id: riderId },
+        '[average_spending#getRidesByStatus] User does not exist');
+      return res.sendStatus(HttpStatus.NOT_FOUND);
+    }
+    req.logger.info(
+      { rider_id: riderId, err },
+      '[average_spending#getRidesByStatus] Error while fetching user\'s average spending');
+    return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+  return res.send({ average_spending: averageSpending });
 }
 
 module.exports = {

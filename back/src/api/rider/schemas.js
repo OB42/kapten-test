@@ -9,7 +9,7 @@ const getLoyaltyInfoSchema = Joi.object().keys({
 
 const getAverageSpendingSchema = Joi.object().keys({
   rider_id: Joi.objectId().required(),
-  status: Joi.valid(loyaltyStatuses).default('bronze')
+  status: Joi.valid(loyaltyStatuses).required()
 });
 
 module.exports = { getLoyaltyInfoSchema, getAverageSpendingSchema };

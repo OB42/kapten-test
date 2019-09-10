@@ -2,6 +2,8 @@
 
 const riders = require('../models/riders');
 
+const rides = require('../models/rides');
+
 const loyalty = require('./loyalty');
 
 const RIDER_NOT_FOUND = new Error('Rider not found');
@@ -35,7 +37,29 @@ async function getLoyaltyInfo(id) {
   };
 }
 
+/**
+ * getAverageSpendingByStatus tries to calculate the average amount spent
+ * on rides matching a given rider_id and status
+ *
+ * @param {ObjectId} id - the user's mongo id
+ * @param {String} status - the status
+ *
+ * @returns {Number} the average amount spent
+ */
+async function getAverageSpendingByStatus(id, status) {
+  const rider = await riders.findOneById(id);
+
+  if (!rider) {
+    throw RIDER_NOT_FOUND;
+  }
+  const arr = await rides.find({ rider_status: status, rider_id: id },
+    { amount: 1, _id: 0 }).toArray();
+    // if no rides are found, returns 0 instead of calculating average amount
+  return arr.length ? (arr.map(x => x.amount).reduce((a, b) => a + b) / arr.length) : 0;
+}
+
 module.exports = {
   getLoyaltyInfo,
-  RIDER_NOT_FOUND
+  RIDER_NOT_FOUND,
+  getAverageSpendingByStatus
 };
