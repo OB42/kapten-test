@@ -21,10 +21,24 @@ async function handleRideCompletedEvent(message) {
     ObjectId.createFromHexString(rideId)
   );
 
-  const rider = await riderModel.findOneById(
+  let rider = await riderModel.findOneById(
     ObjectId.createFromHexString(riderId)
   );
-
+  if (ride && ride.state === 'completed') {
+    logger.info(
+      { ride_id: rideId },
+      '[worker.handleRideCompletedEvent] Ride already completed');
+    return;
+  }
+  if (!rider) {
+    logger.info(
+      { rider_id: riderId },
+      '[worker.handleRideCompletedEvent] Rider does not exists: insert him');
+    rider = {
+      _id: riderId
+    };
+    rider = await riderModel.insertOne(rider);
+  }
   if (!ride) {
     logger.info(
       { ride_id: rideId, rider_id: riderId },
