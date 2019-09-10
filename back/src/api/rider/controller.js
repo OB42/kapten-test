@@ -5,7 +5,7 @@ const HttpStatus = require('http-status-codes');
 const Joi = require('../../lib/joi');
 const ridersLib = require('../../lib/riders');
 
-const { getLoyaltyInfoSchema } = require('./schemas');
+const { getLoyaltyInfoSchema, getAverageSpendingSchema } = require('./schemas');
 
 const { RIDER_NOT_FOUND } = ridersLib;
 
@@ -50,6 +50,34 @@ async function getLoyaltyInfo(req, res) {
   return res.send(rider);
 }
 
+/**
+ * Get the average amount spent on all rides for a given user and a given loyalty status
+ *
+ * @param {Object} req express request
+ * @param {Object} res express response
+ *
+ * @returns {Object} response
+ */
+async function getAverageSpendingByStatus(req, res) {
+  const { error, value: validatedParams } = Joi
+    .validate(req.params, getAverageSpendingSchema);
+
+  if (error) {
+    req.logger.info({ error }, '[average_spending#getAverageSpendingByStatus] Error: invalid body');
+    return res.sendStatus(HttpStatus.BAD_REQUEST);
+  }
+
+  const { rider_id: riderId, status } = validatedParams;
+  req.logger.info(
+    { rider_id: riderId, status },
+    '[average_spending#getRidesByStatus]  requested');
+  // TOOD:
+  // get rides and calculate average spending
+  // handle edge cases
+  return res.send('');
+}
+
 module.exports = {
-  getLoyaltyInfo
+  getLoyaltyInfo,
+  getAverageSpendingByStatus
 };

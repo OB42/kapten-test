@@ -45,7 +45,6 @@ describe('models/rides', () => {
         amount: 10,
         created_at: date,
         state: 'created'
-
       }]);
     });
   });
