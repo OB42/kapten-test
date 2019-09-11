@@ -70,6 +70,7 @@ async function getAverageSpendingByStatus(req, res) {
   req.logger.info(
     { rider_id: riderId, status },
     '[average_spending#getRidesByStatus] Average rider spending requested');
+
   let averageSpending;
   try {
     averageSpending = await ridersLib.getAverageSpendingByStatus(riderId, status);
@@ -85,6 +86,7 @@ async function getAverageSpendingByStatus(req, res) {
       '[average_spending#getRidesByStatus] Error while fetching user\'s average spending');
     return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
   return res.send({ average_spending: averageSpending });
 }
 

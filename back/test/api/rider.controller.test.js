@@ -90,7 +90,6 @@ describe('api/rider', () => {
     });
   });
   describe('GET /average_spending/:rider_id/:status', () => {
-
     it('returns 400 if rider id is invalid', async () => {
       const { body, status } = await request(app)
         .get('/api/rider/average_spending/invalid_id/bronze');
@@ -112,6 +111,7 @@ describe('api/rider', () => {
         points: 150,
         status: 'silver'
       });
+
       const unexpectedError = new Error('Unexpected error');
       const getLoyaltyInfoStub = sandbox.stub(ridersLib, 'getAverageSpendingByStatus')
         .rejects(unexpectedError);
@@ -120,10 +120,6 @@ describe('api/rider', () => {
         .get(`/api/rider/average_spending/${riderId}/bronze`);
 
       expect({ body, status }).to.deep.equal({ body: {}, status: 500 });
-
-      // expect(getLoyaltyInfoStub.args).to.deep.equal([
-        // [ObjectId.createFromHexString('000000000000000000000001')]
-      // ]);
     });
 
     it('returns rider average spending', async () => {
@@ -149,10 +145,108 @@ describe('api/rider', () => {
         rider_status: 'silver',
         state: 'created'
       });
+
       const { body, status } = await request(app)
         .get(`/api/rider/average_spending/${riderId}/silver`);
-      console.log(body, status, infoSpy.args)
+
       expect({ body, status }).to.deep.equal({ body: {average_spending: 25}, status: 200 });
     });
+
+    it('returns 0 if no rides are found for this rider', async () => {
+      await riders.insertOne({
+        _id: riderId,
+        ride_count: 30,
+        points: 150,
+        status: 'silver'
+      });
+
+      const { body, status } = await request(app)
+        .get(`/api/rider/average_spending/${riderId}/silver`);
+
+      expect({ body, status }).to.deep.equal({ body: {average_spending: 0}, status: 200 });
+    });
   });
+
+  describe('POST /remove_loyalty_points', () => {
+    it('returns 400 if rider id is invalid', async () => {
+      const { body, status } = await request(app)
+        .post('/remove_loyalty_points').send({ rider_id: 'invalid_id', points: 42 });
+
+      expect({ body, status }).to.deep.equal({ body: {}, status: 400 });
+    });
+
+    it('returns 404 if rider is not found', async () => {
+      const { body, status } = await request(app)
+        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 42 });
+
+      expect({ body, status }).to.deep.equal({ body: {}, status: 404 });
+    });
+
+    it('returns 500 if there is an unexpected error while fetching data', async () => {
+      await riders.insertOne({
+        _id: riderId,
+        ride_count: 30,
+        points: 150,
+        status: 'silver'
+      });
+
+      const unexpectedError = new Error('Unexpected error');
+      const getLoyaltyInfoStub = sandbox.stub(ridersLib, 'removeLoyaltyPoints')
+        .rejects(unexpectedError);
+
+      const { body, status } = await request(app)
+        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 42 });
+
+      expect({ body, status }).to.deep.equal({ body: {}, status: 500 });
+    });
+
+    it('removes points from the rider', async () => {
+      await riders.insertOne({
+        _id: riderId,
+        ride_count: 30,
+        points: 150,
+        status: 'silver'
+      });
+
+      const { body, status } = await request(app)
+        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 50 });
+
+      expect({ body, status }).to.deep.equal({ body: {}, status: 200 });
+      expect(riderModel.findOneById(riderObjectId)).to.deep.equal({
+        _id: riderId,
+        ride_count: 30,
+        points: 100,
+        status: 'silver'
+      });
+    });
+
+    it('returns 400 if the rider doesn\'t have enough points', async () => {
+      await riders.insertOne({
+        _id: riderId,
+        ride_count: 30,
+        points: 150,
+        status: 'silver'
+      });
+
+      const { body, status } = await request(app)
+        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 200 });
+
+      expect(status).to.equal(400);
+    });
+
+    it('returns 400 if "points" is not a positive number', async () => {
+      await riders.insertOne({
+        _id: riderId,
+        ride_count: 30,
+        points: 150,
+        status: 'silver'
+      });
+
+      const { body, status } = await request(app)
+        .post('/remove_loyalty_points').send({ rider_id: riderId, points: -42 });
+
+      expect(status).to.equal(400);
+    });
+  });
+
 });

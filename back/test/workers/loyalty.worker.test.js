@@ -214,7 +214,6 @@ describe('workers/loyalty', () => {
         rider_status: 'bronze',
         state: 'created'
       }]);
-      console.log('42');
 
       expect(infoSpy.args).to.deep.equal([
         [
@@ -408,7 +407,9 @@ describe('workers/loyalty', () => {
 
       const ride = await rideModel.findOneById(rideObjectId);
       const rider = await riderModel.findOneById(ride.rider_id);
+
       await publish('ride.completed', message);
+
       expect(ride).to.deep.equal(await rideModel.findOneById(rideObjectId));
       expect(rider).to.deep.equal(await riderModel.findOneById(ride.rider_id));
       expect(infoSpy.args.slice(-2)).to.deep.equal([
@@ -446,6 +447,7 @@ describe('workers/loyalty', () => {
         created_at: date,
         state: 'completed'
       });
+  
       expect(infoSpy.args).to.deep.equal([
           [
             {

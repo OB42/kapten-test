@@ -17,19 +17,17 @@ async function handleRideCompletedEvent(message) {
   logger.info(
     { ride_id: rideId, rider_id: riderId, amount },
     '[worker.handleRideCompletedEvent] Received user ride completed event');
-  let ride = await rideModel.findOneById(
-    ObjectId.createFromHexString(rideId)
-  );
 
-  let rider = await riderModel.findOneById(
-    ObjectId.createFromHexString(riderId)
-  );
+
+  let ride = await rideModel.findOneById(ObjectId.createFromHexString(rideId));
   if (ride && ride.state === 'completed') {
     logger.info(
       { ride_id: rideId },
       '[worker.handleRideCompletedEvent] Ride already completed');
     return;
   }
+
+  let rider = await riderModel.findOneById(ObjectId.createFromHexString(riderId));
   if (!rider) {
     logger.info(
       { rider_id: riderId },
@@ -39,6 +37,7 @@ async function handleRideCompletedEvent(message) {
     };
     rider = await riderModel.insertOne(rider);
   }
+
   if (!ride) {
     logger.info(
       { ride_id: rideId, rider_id: riderId },
@@ -52,6 +51,7 @@ async function handleRideCompletedEvent(message) {
   } else {
     await rideModel.updateOne(ride._id, { state: 'completed' });
   }
+
   await riderModel.updateOne(rider._id, {
     points: loyalty.getLoyaltyPointsForRideAmount(rider.status, amount),
     ride_count: rider.ride_count + 1

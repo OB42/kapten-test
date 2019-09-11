@@ -21,6 +21,7 @@ async function handleRideCreatedEvent(message) {
   let rider = await riderModel.findOneById(
     ObjectId.createFromHexString(riderId)
   );
+
   if (!rider) {
     rider = {
       _id: riderId
