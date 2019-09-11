@@ -12,4 +12,8 @@ const getAverageSpendingSchema = Joi.object().keys({
   status: Joi.valid(loyaltyStatuses).required()
 });
 
-module.exports = { getLoyaltyInfoSchema, getAverageSpendingSchema };
+const removeLoyaltyPointsSchema = Joi.object().keys({
+  rider_id: Joi.objectId().required(),
+  points: Joi.number().min(0).required()
+});
+module.exports = { getLoyaltyInfoSchema, getAverageSpendingSchema, removeLoyaltyPointsSchema };
