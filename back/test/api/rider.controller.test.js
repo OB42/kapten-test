@@ -8,6 +8,7 @@ const { ObjectId } = require('mongodb');
 
 const { start, stop } = require('../../src/app');
 const ridersLib = require('../../src/lib/riders');
+const dateLib = require('../../src/lib/date');
 const riders = require('../../src/models/riders');
 const rides = require('../../src/models/rides');
 
@@ -33,6 +34,7 @@ describe('api/rider', () => {
   beforeEach(async () => {
     await riders.collection().remove({});
     await rides.collection().remove({});
+    sandbox.stub(dateLib, 'getDate').returns(date);
     infoSpy = sandbox.spy(logger, 'info');
   });
 
@@ -170,14 +172,14 @@ describe('api/rider', () => {
   describe('POST /remove_loyalty_points', () => {
     it('returns 400 if rider id is invalid', async () => {
       const { body, status } = await request(app)
-        .post('/remove_loyalty_points').send({ rider_id: 'invalid_id', points: 42 });
+        .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: 'invalid_id', points: 42 });
 
       expect({ body, status }).to.deep.equal({ body: {}, status: 400 });
     });
 
     it('returns 404 if rider is not found', async () => {
       const { body, status } = await request(app)
-        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 42 });
+        .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: riderId, points: 42 });
 
       expect({ body, status }).to.deep.equal({ body: {}, status: 404 });
     });
@@ -195,7 +197,7 @@ describe('api/rider', () => {
         .rejects(unexpectedError);
 
       const { body, status } = await request(app)
-        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 42 });
+        .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: riderId, points: 42 });
 
       expect({ body, status }).to.deep.equal({ body: {}, status: 500 });
     });
@@ -209,18 +211,19 @@ describe('api/rider', () => {
       });
 
       const { body, status } = await request(app)
-        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 50 });
+        .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: riderId, points: 50 });
 
       expect({ body, status }).to.deep.equal({ body: {}, status: 200 });
-      expect(riderModel.findOneById(riderObjectId)).to.deep.equal({
-        _id: riderId,
+      expect(await riders.findOneById(riderObjectId)).to.deep.equal({
+        _id: riderObjectId,
         ride_count: 30,
         points: 100,
-        status: 'silver'
+        status: 'silver',
+        created_at: date
       });
     });
 
-    it('returns 400 if the rider doesn\'t have enough points', async () => {
+    it('returns 403 if the rider doesn\'t have enough points', async () => {
       await riders.insertOne({
         _id: riderId,
         ride_count: 30,
@@ -229,9 +232,9 @@ describe('api/rider', () => {
       });
 
       const { body, status } = await request(app)
-        .post('/remove_loyalty_points').send({ rider_id: riderId, points: 200 });
+        .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: riderId, points: 200 });
 
-      expect(status).to.equal(400);
+      expect(status).to.equal(403);
     });
 
     it('returns 400 if "points" is not a positive number', async () => {
@@ -243,7 +246,7 @@ describe('api/rider', () => {
       });
 
       const { body, status } = await request(app)
-        .post('/remove_loyalty_points').send({ rider_id: riderId, points: -42 });
+        .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: riderId, points: -42 });
 
       expect(status).to.equal(400);
     });
