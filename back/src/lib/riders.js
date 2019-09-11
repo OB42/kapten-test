@@ -8,6 +8,8 @@ const loyalty = require('./loyalty');
 
 const RIDER_NOT_FOUND = new Error('Rider not found');
 
+const NOT_ENOUGH_POINTS = new Error('Rider does not have enough loyalty points');
+
 /**
  * getLoyaltyInfo tries to fetch rider with its id and return all his info
  * linked to the loyalty program
@@ -58,8 +60,30 @@ async function getAverageSpendingByStatus(id, status) {
   return arr.length ? (arr.map(x => x.amount).reduce((a, b) => a + b) / arr.length) : 0;
 }
 
+/**
+ * removeLoyaltyPoints tries to remove loyalty points from a user
+ *
+ * @param {ObjectId} id - the user's mongo id
+ * @param {String} points - the number of points to remov
+ *
+ * @returns {void}
+ */
+async function removeLoyaltyPoints(id, points) {
+  const rider = await riders.findOneById(id);
+
+  if (!rider) {
+    throw RIDER_NOT_FOUND;
+  }
+  if (rider.points < points) {
+    throw NOT_ENOUGH_POINTS;
+  }
+  riders.updateOne(rider._id, { points: rider.points - points });
+}
+
 module.exports = {
   getLoyaltyInfo,
   RIDER_NOT_FOUND,
-  getAverageSpendingByStatus
+  NOT_ENOUGH_POINTS,
+  getAverageSpendingByStatus,
+  removeLoyaltyPoints
 };

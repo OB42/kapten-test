@@ -11,4 +11,6 @@ router.get('/loyalty/:rider_id', wrap(controller.getLoyaltyInfo));
 
 router.get('/average_spending/:rider_id/:status', wrap(controller.getAverageSpendingByStatus));
 
+router.post('/remove_loyalty_points', wrap(controller.removeLoyaltyPoints));
+
 module.exports = router;
