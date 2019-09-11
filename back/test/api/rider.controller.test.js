@@ -193,13 +193,16 @@ describe('api/rider', () => {
       });
 
       const unexpectedError = new Error('Unexpected error');
-      const getLoyaltyInfoStub = sandbox.stub(ridersLib, 'removeLoyaltyPoints')
+      const removeLoyaltyPointsStub = sandbox.stub(ridersLib, 'removeLoyaltyPoints')
         .rejects(unexpectedError);
 
       const { body, status } = await request(app)
         .post('/api/rider/remove_loyalty_points').type('form').send({ rider_id: riderId, points: 42 });
 
       expect({ body, status }).to.deep.equal({ body: {}, status: 500 });
+      expect(removeLoyaltyPointsStub.args).to.deep.equal([
+        [ObjectId.createFromHexString('000000000000000000000001'), 42],
+      ]);
     });
 
     it('removes points from the rider', async () => {
